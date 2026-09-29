@@ -9,6 +9,13 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
     const [category, setCategory] = useState("");
     const [date, setDate] = useState("");
     const [errors, setErrors] = useState({});
+    const expectedTypes = {
+        id: 'number',
+        description: 'string',
+        amount: 'number',
+        category: 'string',
+        date: 'string'
+    }
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -135,7 +142,7 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
                                 return remainingErrors;
                             })
                         }
-
+                        
                     }} />
                     {errors.date && <p id='date-error'>{errors.date}</p>}
                 </div>
