@@ -1,4 +1,4 @@
-export default function ExpenseItem({onDeleteExpense, onEditExpense, expense}) {
+export default function ExpenseItem({onEditExpense, expense, onRequestDelete}) {
     return (
         <div>
             <div>
@@ -8,7 +8,7 @@ export default function ExpenseItem({onDeleteExpense, onEditExpense, expense}) {
                 <p>{expense.date}</p>
             </div>
             <div>
-                <button className='delete-btn' onClick={() => onDeleteExpense(expense.id)}>Delete</button>
+                <button className='delete-btn' onClick={() => onRequestDelete(expense)}>Delete</button>
                 <button className='edit-btn' onClick={() => onEditExpense(expense)}>Edit</button>
             </div>
         </div>

@@ -5,22 +5,6 @@ import { categories } from '@/data/categories';
 import ExpenseSummary from './ExpenseSummary';
 import ExpenseList from './ExpenseList';
 
-const sampleExpenses = [
-    {
-        id: 1,
-        description: 'KFC',
-        amount: 7000,
-        category: 'Food',
-        date: '2026-09-16',
-    },
-    {
-        id: 2,
-        description: 'Car wash',
-        amount: 3500,
-        category: 'Other',
-        date: '2026-09-19',
-    }
-];
 
 const sortOptions = [
     'Newest',
@@ -37,9 +21,10 @@ export default function ExpenseTracker() {
     const [categoryFilter, setCategoryFilter] = useState("");
     const [sort, setSort] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
+    const [storageError, setStorageError] = useState(false);
+    const [expenseToDelete, setExpenseToDelete] = useState(null);
     const filteredExpenses = expenses.filter(expense => expense.description.toLowerCase().includes(searchTerm.toLowerCase()) && (expense.category === categoryFilter || categoryFilter === ""));
     const sortedExpenses = sortExpenses(filteredExpenses);
-    console.log(filteredExpenses);
 
 
     function handleAddExpense(newExpense) {
@@ -51,6 +36,10 @@ export default function ExpenseTracker() {
             }
         ])
     };
+
+    function handleRequestDelete(expense) {
+        setExpenseToDelete(expense.id);
+    }
 
     function handleDeleteExpense(id) {
         setExpenses(prev => prev.filter(expense => expense.id !== id));
@@ -74,7 +63,6 @@ export default function ExpenseTracker() {
     function sortExpenses(array) {
         switch (sort) {
             case 'Newest':
-                console.log(array.map(item => item.date))
                 return [...array].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             case 'Oldest':
@@ -96,21 +84,48 @@ export default function ExpenseTracker() {
     }
 
     useEffect(() => {
-        const savedExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        setExpenses(savedExpenses);
-        setIsLoaded(true);
+        try {
+            const savedExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            if (!Array.isArray(savedExpenses)) {
+                setStorageError(true);
+            }
+            else {
+                setExpenses(savedExpenses);
+                setStorageError(false);
+            }
+            setIsLoaded(true);
+
+        }
+        catch (error) {
+            console.error('Stored expense data could not be loaded.');
+            setIsLoaded(true);
+            setStorageError(true);
+        }
     }, []);
 
     useEffect(() => {
-        if (isLoaded === true) {
+        if (!isLoaded || storageError) return
+        try {
             localStorage.setItem('expenses', JSON.stringify(expenses));
         }
-    }, [expenses]);
+        catch (error) {
+            console.error("Could not save expenses to local storage.");
+            setStorageError(true);
+        }
+    }, [expenses, isLoaded, storageError]);
 
+    const dialogRef = useRef(null);
+
+    useEffect(() => {
+        if (expenseToDelete) {
+            dialogRef.current.showModal();
+        }
+    }, [expenseToDelete]);
 
     return (
         <>
             <p>Expenses: {expenses.length}</p>
+            {storageError && <p>We couldn't save your expenses. Your changes may not persist.</p>}
             <div>
                 <input type="text" placeholder='Search your expenses...' value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
                 <select name="" id="" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
@@ -133,14 +148,26 @@ export default function ExpenseTracker() {
                 onUpdateExpense={handleUpdateExpense}
             />
             <ExpenseList
-                onDeleteExpense={handleDeleteExpense}
                 onEditExpense={handleEditExpense}
                 sortedExpenses={sortedExpenses}
                 hasExpenses={expenses.length !== 0}
+                onRequestDelete={handleRequestDelete}
             />
             <ExpenseSummary
                 filteredExpenses={filteredExpenses}
             />
+            <dialog ref={dialogRef}>
+                <p>Are you sure you want to delete this expense?</p>
+                <button onClick={() => {
+                    setExpenseToDelete(null);
+                    dialogRef.current.close();
+                }}>Cancel</button>
+                <button onClick={() => {
+                    handleDeleteExpense(expenseToDelete);
+                    dialogRef.current.close();
+                    setExpenseToDelete(null);
+                }}>Delete</button>
+            </dialog>
         </>
     )
 }
