@@ -4,7 +4,8 @@ import ExpenseForm from './ExpenseForm';
 import { categories } from '@/data/categories';
 import ExpenseSummary from './ExpenseSummary';
 import ExpenseList from './ExpenseList';
-import isValidExpense from '@/utils/persistentExpenseValidation';
+import isValidExpense from '@/utils/persistentExpenseLoadValidation';
+import styles from './ExpenseTracker.module.css'
 
 
 const sortOptions = [
@@ -22,10 +23,16 @@ export default function ExpenseTracker() {
     const [categoryFilter, setCategoryFilter] = useState("");
     const [sort, setSort] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
-    const [storageError, setStorageError] = useState(false);
+    const [isLoadFailed, setIsLoadFailed] = useState(false);
+    const [isSaveFailed, setIsSaveFailed] = useState(false);
     const [expenseToDelete, setExpenseToDelete] = useState(null);
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const filteredExpenses = expenses.filter(expense => expense.description.toLowerCase().includes(searchTerm.toLowerCase()) && (expense.category === categoryFilter || categoryFilter === ""));
     const sortedExpenses = sortExpenses(filteredExpenses);
+
+
+    const dialogRef = useRef(null);
+    const expenseDialogRef = useRef(null);
 
 
     function handleAddExpense(newExpense) {
@@ -80,15 +87,28 @@ export default function ExpenseTracker() {
         };
     };
 
+    function saveExpenses() {
+        if (!isLoaded || isLoadFailed) return
+        try {
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            setIsSaveFailed(false);
+        }
+        catch (error) {
+            console.error("Could not save expenses to local storage.");
+            setIsSaveFailed(true);
+        }
+    }
+
     function handleFinishEditing() {
         setExpenseToEdit(null);
     }
+
+
 
     useEffect(() => {
         try {
             const savedExpenses = JSON.parse(localStorage.getItem('expenses')) || [];
             if (!Array.isArray(savedExpenses)) {
-                setStorageError(true);
                 throw new Error('Expense data is not an array.')
             }
             else if (!savedExpenses.every(expense => isValidExpense(expense))) {
@@ -96,82 +116,101 @@ export default function ExpenseTracker() {
             }
             else {
                 setExpenses(savedExpenses);
-                setStorageError(false);
+                setIsLoadFailed(false);
             }
-        setIsLoaded(true);
-    }
+            setIsLoaded(true);
+        }
         catch (error) {
-        console.error('Stored expense data could not be loaded.', error);
-        setIsLoaded(true);
-        setStorageError(true);
-    }
-}, []);
+            console.error('Stored expense data could not be loaded.', error);
+            setIsLoaded(true);
+            setIsLoadFailed(true);
+        }
+    }, []);
 
-useEffect(() => {
-    if (!isLoaded || storageError) return
-    try {
-        localStorage.setItem('expenses', JSON.stringify(expenses));
-    }
-    catch (error) {
-        console.error("Could not save expenses to local storage.");
-        setStorageError(true);
-    }
-}, [expenses, isLoaded, storageError]);
+    useEffect(() => {
+        saveExpenses();
+    }, [expenses, isLoaded, isLoadFailed]);
 
-const dialogRef = useRef(null);
+    useEffect(() => {
+        if (expenseToDelete) {
+            dialogRef.current.showModal();
+        }
+    }, [expenseToDelete]);
 
-useEffect(() => {
-    if (expenseToDelete) {
-        dialogRef.current.showModal();
-    }
-}, [expenseToDelete]);
 
-return (
-    <>
-        <p>Expenses: {expenses.length}</p>
-        {storageError && <p>We couldn't save your expenses. Your changes may not persist.</p>}
-        <div>
-            <input type="text" placeholder='Search your expenses...' value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-            <select name="" id="" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-                <option value={""}>All categories</option>
-                {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                ))}
-            </select>
-            <select name="" id="" value={sort} onChange={(event) => setSort(event.target.value)}>
-                <option value={""}>Sort by</option>
-                {sortOptions.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                ))}
-            </select>
-        </div>
-        <ExpenseForm
-            onAddExpense={handleAddExpense}
-            expenseToEdit={expenseToEdit}
-            onFinishEditing={handleFinishEditing}
-            onUpdateExpense={handleUpdateExpense}
-        />
-        <ExpenseList
-            onEditExpense={handleEditExpense}
-            sortedExpenses={sortedExpenses}
-            hasExpenses={expenses.length === 0}
-            onRequestDelete={handleRequestDelete}
-        />
-        <ExpenseSummary
-            filteredExpenses={filteredExpenses}
-        />
-        <dialog ref={dialogRef}>
-            <p>Are you sure you want to delete this expense?</p>
-            <button onClick={() => {
-                setExpenseToDelete(null);
-                dialogRef.current.close();
-            }}>Cancel</button>
-            <button onClick={() => {
-                handleDeleteExpense(expenseToDelete);
-                dialogRef.current.close();
-                setExpenseToDelete(null);
-            }}>Delete</button>
-        </dialog>
-    </>
-)
+    return (
+        <main className='main-container'>
+            {isLoadFailed && <p>We couldn't load your expenses.</p>}
+            {isSaveFailed &&
+                <div>
+                    <p>We couldn't save your expenses. Your changes are still visible but they may be lost if you refresh.</p>
+                    <button onClick={saveExpenses}>Retry Save</button>
+                </div>}
+
+            <header>
+                <div>
+                    <h1>Expense Tracker</h1>
+                    <p>Track all your spending with ease.</p>
+                </div>
+                <button onClick={() => {setIsFormOpen(true)}}>Add Expense</button>
+            </header>
+
+
+            <section>
+                <ExpenseForm
+                    onAddExpense={handleAddExpense}
+                    expenseToEdit={expenseToEdit}
+                    onFinishEditing={handleFinishEditing}
+                    onUpdateExpense={handleUpdateExpense}
+                    expenseDialogRef={expenseDialogRef}
+                    isFormOpen={isFormOpen}
+                    setIsFormOpen={setIsFormOpen}
+                />
+            </section>
+
+            <section>
+                <ExpenseSummary
+                    filteredExpenses={filteredExpenses}
+                />
+            </section>
+
+            <section>
+                <div>
+                    <input type="text" placeholder='Search your expenses...' value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+                    <select name="" id="" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+                        <option value={""}>All categories</option>
+                        {categories.map(category => (
+                            <option key={category} value={category}>{category}</option>
+                        ))}
+                    </select>
+                    <select name="" id="" value={sort} onChange={(event) => setSort(event.target.value)}>
+                        <option value={""}>Sort by</option>
+                        {sortOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <ExpenseList
+                    onEditExpense={handleEditExpense}
+                    sortedExpenses={sortedExpenses}
+                    hasExpenses={expenses.length !== 0}
+                    onRequestDelete={handleRequestDelete}
+                />
+            </section>
+
+            <dialog ref={dialogRef}>
+                <p>Are you sure you want to delete this expense?</p>
+                <button onClick={() => {
+                    setExpenseToDelete(null);
+                    dialogRef.current.close();
+                }}>Cancel</button>
+                <button onClick={() => {
+                    handleDeleteExpense(expenseToDelete);
+                    dialogRef.current.close();
+                    setExpenseToDelete(null);
+                }}>Delete</button>
+            </dialog>
+        </main>
+    )
 }

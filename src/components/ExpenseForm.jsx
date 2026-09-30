@@ -1,21 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { categories } from '@/data/categories';
 
 
-export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditing, onUpdateExpense }) {
+export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditing, onUpdateExpense, expenseDialogRef, isFormOpen, setIsFormOpen }) {
     const [description, setDescription] = useState("");
     const [amount, setAmount] = useState("");
     const [category, setCategory] = useState("");
     const [date, setDate] = useState("");
     const [errors, setErrors] = useState({});
-    const expectedTypes = {
-        id: 'number',
-        description: 'string',
-        amount: 'number',
-        category: 'string',
-        date: 'string'
-    }
+
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -81,8 +75,12 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
         }
     }, [expenseToEdit]);
 
+    useEffect(() => {
+        isFormOpen ? expenseDialogRef.current.showModal() : expenseDialogRef.current.close()
+    }, [isFormOpen])
+
     return (
-        <>
+        <dialog ref={expenseDialogRef}>
             <form action="" onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="description">Description</label>
@@ -146,8 +144,8 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
                     }} />
                     {errors.date && <p id='date-error'>{errors.date}</p>}
                 </div>
-                <button type='submit'>{expenseToEdit ? 'Edit Expense' : 'Add Expense'}</button>
+                <button type='submit' onClick={() => setIsFormOpen(false)}>{expenseToEdit ? 'Edit Expense' : 'Add Expense'}</button>
             </form>
-        </>
+        </dialog>
     )
 }

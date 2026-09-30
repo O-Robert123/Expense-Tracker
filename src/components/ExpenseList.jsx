@@ -12,7 +12,7 @@ export default function ExpenseList({sortedExpenses, onEditExpense, hasExpenses,
                         onRequestDelete={onRequestDelete}
                         />
                     ))
-                    : <p>{hasExpenses ? "No expenses yet!" : "No expenses match your search/filter."}</p>
+                    : <p>{hasExpenses ?  "No expenses match your search/filter." : "No expenses yet!"}</p>
                 }
             </div>
     )
