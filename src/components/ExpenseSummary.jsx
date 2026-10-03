@@ -1,4 +1,6 @@
 'use client';
+import styles from './ExpenseSummary.module.css';
+import { categoryColors } from '@/data/categoryColours';
 
 export default function ExpenseSummary({ filteredExpenses }) {
     function calculateCategoricalTotalExpenses(arr) {
@@ -23,15 +25,15 @@ export default function ExpenseSummary({ filteredExpenses }) {
     const totalExpenses = calculateTotalExpenses(filteredExpenses);
 
     return (
-        <div>
-            <div>
-                {Object.keys(categoryTotals).map(category => (
-                    <p key={category}>{category}: {categoryTotals[category]}</p>
-                ))}
-            </div>
-            <div>
-                <p>Total : {totalExpenses}</p>
-            </div>
-        </div>
+        <div className={styles.expenseSummary}>
+            <div className={styles.totalContainer}><p className={styles.total}>Total</p>
+            <p className={styles.totalAmount}>₦{totalExpenses.toLocaleString()}</p></div>
+            {
+        Object.keys(categoryTotals).map(category => (
+            <div className={styles.expenseSummaryItem} key={category} style={{ backgroundColor: categoryColors[category] }}><p className={styles.category}>{category}</p>
+                <p className={styles.categoryAmount}> ₦{categoryTotals[category].toLocaleString()}</p></div>
+        ))
+    }
+        </div >
     )
 }

@@ -139,7 +139,7 @@ export default function ExpenseTracker() {
 
 
     return (
-        <main className='main-container'>
+        <main className={styles.expenseTracker}>
             {isLoadFailed && <p>We couldn't load your expenses.</p>}
             {isSaveFailed &&
                 <div>
@@ -147,12 +147,14 @@ export default function ExpenseTracker() {
                     <button onClick={saveExpenses}>Retry Save</button>
                 </div>}
 
-            <header>
+            <header className={styles.header}>
                 <div>
-                    <h1>Expense Tracker</h1>
-                    <p>Track all your spending with ease.</p>
+                    <h1 className={styles.heading}>Expense Tracker</h1>
+                    <p className={styles.headingText}>Track all your spending with ease.</p>
                 </div>
-                <button onClick={() => {setIsFormOpen(true)}}>Add Expense</button>
+                <button className={styles.addExpenseBtn} onClick={() => { setIsFormOpen(true) }}><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" className="bi bi-plus" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                </svg>Add Expense</button>
             </header>
 
 
@@ -174,16 +176,16 @@ export default function ExpenseTracker() {
                 />
             </section>
 
-            <section>
-                <div>
-                    <input type="text" placeholder='Search your expenses...' value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
-                    <select name="" id="" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <section className={styles.expenseList}>
+                <div className={styles.sortAndSearchSection}>
+                    <input className={styles.searchInput} type="text" placeholder='Search your expenses...' value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+                    <select className={styles.categorySelect} name="" id="" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
                         <option value={""}>All categories</option>
                         {categories.map(category => (
                             <option key={category} value={category}>{category}</option>
                         ))}
                     </select>
-                    <select name="" id="" value={sort} onChange={(event) => setSort(event.target.value)}>
+                    <select className={styles.sortSelect} name="" id="" value={sort} onChange={(event) => setSort(event.target.value)}>
                         <option value={""}>Sort by</option>
                         {sortOptions.map(opt => (
                             <option key={opt} value={opt}>{opt}</option>
@@ -211,6 +213,6 @@ export default function ExpenseTracker() {
                     setExpenseToDelete(null);
                 }}>Delete</button>
             </dialog>
-        </main>
+        </main >
     )
 }
