@@ -1,8 +1,10 @@
 import ExpenseItem from "./ExpenseItem";
+import { categoryColors } from "@/data/categoryColours";
+import styles from "@/components/ExpenseList.module.css"
 
 export default function ExpenseList({sortedExpenses, onEditExpense, hasExpenses, onRequestDelete}) {
     return (
-        <div>
+        <div className={styles.ExpenseListContainer}>
                 {sortedExpenses.length !== 0 ?
                     sortedExpenses.map(expense => (
                         <ExpenseItem 

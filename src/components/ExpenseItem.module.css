@@ -1,0 +1,84 @@
+.expenseItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: white;
+}
+
+.expenseItemInfo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.expenseItemBtns {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+.iconOuterSpan {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.expenseDescription {
+    margin: 0;
+    font-size: 24px;
+}
+
+.expenseCategory {
+    margin: 0;
+}
+
+.expenseAmount {
+    margin: 0;
+    margin-left: 40px;
+    color: red;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.expenseDate {
+    margin: 0;
+}
+
+.deleteBtn {
+    background-color: red;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+}
+
+.editBtn {
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    background-color: black;
+    color: white;
+}
+
+.allExpenseInfo{
+    margin-left: 20px;
+}
+
+.dot{
+    font-size: 40px;
+}
+
+.expenseCategorySpan{
+    margin-right: 10px;
+    color: rgb(144, 143, 143);
+    font-size: 14px;
+}
+
+.expenseDateSpan{
+    font-size: 14px;
+    color: rgb(144, 143, 143);
+}

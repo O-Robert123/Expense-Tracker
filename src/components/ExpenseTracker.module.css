@@ -8,14 +8,14 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: white;
+    background-color: #FFFFFF;
     margin-bottom: 50px;
     padding: 10px 20px;
     border-radius: 20px;
 }
 
 .container{
-    background-color: white;
+    background-color: #FFFFFF;
 }
 
 .heading{
@@ -42,14 +42,27 @@
 }
 
 .sortAndSearchSection{
-    background-color: white;
+    background-color: #FFFFFF;
     margin-top: 50px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
     padding: 20px ;
+    border-radius: 10px;
+    margin: 20px;
 }
 
 .searchInput, .categorySelect, .sortSelect{
     width: fit-content;
+}
+
+.searchInput{
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid black;
+    width: 200px;
+}
+
+.categorySelect, .sortSelect{
+    padding: 0px 10px;
+    border-radius: 5px;
 }

@@ -55,6 +55,7 @@ export default function ExpenseTracker() {
 
     function handleEditExpense(expense) {
         setExpenseToEdit(expense);
+        setIsFormOpen(true);
     };
 
     function handleUpdateExpense(UpdatedExpense) {

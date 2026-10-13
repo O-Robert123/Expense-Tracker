@@ -34,6 +34,6 @@ export default function ExpenseSummary({ filteredExpenses }) {
                 <p className={styles.categoryAmount}> ₦{categoryTotals[category].toLocaleString()}</p></div>
         ))
     }
-        </div >
+        </div>
     )
 }

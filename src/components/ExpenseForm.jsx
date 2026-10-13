@@ -59,7 +59,7 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
             onUpdateExpense(UpdatedExpense);
             onFinishEditing();
         }
-
+        setIsFormOpen(false);
         setDescription("");
         setAmount("");
         setCategory("");
@@ -80,7 +80,8 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
     }, [isFormOpen])
 
     return (
-        <dialog ref={expenseDialogRef}>
+        <dialog ref={expenseDialogRef}
+        onClose={() => setIsFormOpen(false)}>
             <form action="" onSubmit={handleSubmit}>
                 <div>
                     <label htmlFor="description">Description</label>
@@ -144,7 +145,7 @@ export default function ExpenseForm({ onAddExpense, expenseToEdit, onFinishEditi
                     }} />
                     {errors.date && <p id='date-error'>{errors.date}</p>}
                 </div>
-                <button type='submit' onClick={() => setIsFormOpen(false)}>{expenseToEdit ? 'Edit Expense' : 'Add Expense'}</button>
+                <button type='submit'>{expenseToEdit ? 'Edit Expense' : 'Add Expense'}</button>
             </form>
         </dialog>
     )
